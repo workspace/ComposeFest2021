@@ -3,10 +3,12 @@ package me.workspace.composelayout
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -14,12 +16,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
+import kotlinx.coroutines.launch
 import me.workspace.composelayout.ui.theme.ComposeLayoutTheme
 
 class MainActivity : ComponentActivity() {
@@ -49,15 +54,52 @@ class MainActivity : ComponentActivity() {
                             )
                         },
                     ) {
-                        LazyColumn {
-                            items(100) { index ->
-                                PhotographerCard(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .wrapContentHeight(),
-                                    name = "Person $index",
-                                    presence = index
-                                )
+                        val listState = rememberLazyListState()
+                        val scope = rememberCoroutineScope()
+                        val size = 100
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                OutlinedButton(
+                                    modifier = Modifier.weight(1F),
+                                    onClick = {
+                                        scope.launch {
+                                            listState.animateScrollToItem(0, 0)
+                                        }
+                                    }
+                                ) {
+                                    Text(text = "Up")
+                                }
+                                OutlinedButton(
+                                    modifier = Modifier.weight(1F),
+                                    onClick = {
+                                        scope.launch {
+                                            listState.animateScrollToItem(size - 1, 0)
+                                        }
+                                    }
+                                ) {
+                                    Text(text = "Down")
+                                }
+                            }
+                            LazyColumn(
+                                state = listState,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1F)
+                            ) {
+                                items(size) { index ->
+                                    PhotographerCard(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .wrapContentHeight(),
+                                        name = "Person $index",
+                                        presence = index
+                                    )
+                                }
                             }
                         }
                     }
@@ -81,13 +123,18 @@ fun PhotographerCard(
             .clickable(onClick = { /* Ignoring onClick */ })
             .padding(16.dp)
     ) {
-        Surface(
-            modifier = Modifier.size(50.dp),
-            shape = CircleShape,
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
-        ) {
-            // Image goes here
-        }
+        Image(
+            painter = rememberImagePainter(
+                data = "https://developer.android.com/images/brand/Android_Robot.png",
+                builder = {
+                    crossfade(true)
+                }
+            ),
+            contentDescription = "Android Logo",
+            modifier = Modifier
+                .clip(CircleShape)
+                .size(50.dp)
+        )
         Column(
             modifier = Modifier
                 .padding(start = 8.dp)
