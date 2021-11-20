@@ -6,9 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -29,9 +32,35 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    PhotographerCard(
-                        modifier = Modifier.fillMaxWidth().wrapContentHeight()
-                    )
+                    Scaffold(
+                        topBar = {
+                            TopAppBar(
+                                title = {
+                                    Text(text = "Layouts")
+                                },
+                                actions = {
+                                    IconButton(onClick = { /*TODO*/ }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Favorite,
+                                            contentDescription = null
+                                        )
+                                    }
+                                }
+                            )
+                        },
+                    ) {
+                        LazyColumn {
+                            items(100) { index ->
+                                PhotographerCard(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight(),
+                                    name = "Person $index",
+                                    presence = index
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -39,7 +68,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun PhotographerCard(modifier: Modifier = Modifier) {
+fun PhotographerCard(
+    modifier: Modifier = Modifier,
+    name: String,
+    presence: Int
+) {
     Row(
         modifier
             .padding(8.dp)
@@ -60,9 +93,9 @@ fun PhotographerCard(modifier: Modifier = Modifier) {
                 .padding(start = 8.dp)
                 .align(Alignment.CenterVertically)
         ) {
-            Text("Alfred Sisley", fontWeight = FontWeight.Bold)
+            Text(name, fontWeight = FontWeight.Bold)
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text("3 minutes ago", style = MaterialTheme.typography.body2)
+                Text("$presence minutes ago", style = MaterialTheme.typography.body2)
             }
         }
     }
@@ -72,6 +105,6 @@ fun PhotographerCard(modifier: Modifier = Modifier) {
 @Composable
 fun PhotographerCardPreview() {
     ComposeLayoutTheme {
-        PhotographerCard()
+        PhotographerCard(Modifier, "Person preview", 5)
     }
 }
