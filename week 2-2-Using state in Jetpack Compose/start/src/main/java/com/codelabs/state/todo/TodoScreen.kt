@@ -155,7 +155,9 @@ fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
         setIcon(TodoIcon.Default)
         setText("")
     }
-    TodoItemInput(text, setText, submit, icon, setIcon, iconsVisible)
+    TodoItemInput(text, setText, submit, icon, setIcon, iconsVisible) {
+        TodoEditButton(onClick = submit, text = "Add", enabled = text.isNotBlank())
+    }
 }
 
 @Composable
@@ -165,7 +167,8 @@ fun TodoItemInput(
     submit: () -> Unit,
     icon: TodoIcon,
     onIconChange: (TodoIcon) -> Unit,
-    iconsVisible: Boolean
+    iconsVisible: Boolean,
+    buttonSlot: @Composable () -> Unit
 ) {
     Column {
         Row(
@@ -181,12 +184,8 @@ fun TodoItemInput(
                     .padding(end = 8.dp),
                 submit
             )
-            TodoEditButton(
-                onClick = submit,
-                text = "Add",
-                modifier = Modifier.align(Alignment.CenterVertically),
-                enabled = text.isNotBlank()
-            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(Modifier.align(Alignment.CenterVertically)) { buttonSlot() }
         }
         if (iconsVisible) {
             AnimatedIconRow(icon, onIconChange, Modifier.padding(top = 8.dp))
@@ -209,7 +208,25 @@ fun TodoItemInlineEditor(
     onIconChange = { onEditItemChange(item.copy(icon = it)) },
     submit = onEditDone,
     iconsVisible = true
-)
+) {
+    Row {
+        val shrinkButtons = Modifier.widthIn(20.dp)
+        TextButton(onClick = onEditDone, modifier = shrinkButtons) {
+            Text(
+                text = "\uD83D\uDCBE", // floppy disk
+                textAlign = TextAlign.End,
+                modifier = Modifier.width(30.dp)
+            )
+        }
+        TextButton(onClick = onRemoveItem, modifier = shrinkButtons) {
+            Text(
+                text = "❌",
+                textAlign = TextAlign.End,
+                modifier = Modifier.width(30.dp)
+            )
+        }
+    }
+}
 
 @Preview
 @Composable
