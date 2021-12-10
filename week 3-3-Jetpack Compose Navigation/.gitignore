@@ -1,0 +1,19 @@
+# Gradle files
+.gradle/
+build/
+
+# Intellij
+.idea
+.idea/caches
+.idea/libraries
+.idea/dictionaries
+.idea/modules
+.idea/*.xml
+*.iml
+*.ipr
+*.iws
+classes
+gen-external-apklibs
+.DS_Store
+
+local.properties
