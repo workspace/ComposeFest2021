@@ -51,7 +51,7 @@ fun TodoScreen(
     Column {
         // add TodoItemInputBackground and TodoItem at the top of TodoScreen
         TodoItemInputBackground(elevate = true, modifier = Modifier.fillMaxWidth()) {
-            TodoItemInput(onItemComplete = onAddItem)
+            TodoItemEntryInput(onItemComplete = onAddItem)
         }
         LazyColumn(
             modifier = Modifier.weight(1f),
@@ -122,7 +122,7 @@ fun TodoInputTextField(
 }
 
 @Composable
-fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
+fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
     val (text, setText) = remember { mutableStateOf("") }
     val (icon, setIcon) = remember { mutableStateOf(TodoIcon.Default)}
     val iconsVisible = text.isNotBlank()
@@ -131,32 +131,41 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
         setIcon(TodoIcon.Default)
         setText("")
     }
+    TodoItemInput(text, setText, submit, icon, setIcon, iconsVisible)
+}
+
+@Composable
+fun TodoItemInput(
+    text: String,
+    onTextChange: (String) -> Unit,
+    submit: () -> Unit,
+    icon: TodoIcon,
+    onIconChange: (TodoIcon) -> Unit,
+    iconsVisible: Boolean
+) {
     Column {
-        Row(Modifier
-            .padding(horizontal = 16.dp)
-            .padding(top = 16.dp)
+        Row(
+            Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp)
         ) {
             TodoInputTextField(
                 text,
-                setText,
+                onTextChange,
                 Modifier
                     .weight(1f)
                     .padding(end = 8.dp),
                 submit
             )
             TodoEditButton(
-                onClick = {
-                    onItemComplete(TodoItem(text, icon))
-                    setIcon(TodoIcon.Default)
-                    setText("")
-                },
+                onClick = submit,
                 text = "Add",
                 modifier = Modifier.align(Alignment.CenterVertically),
                 enabled = text.isNotBlank()
             )
         }
         if (iconsVisible) {
-            AnimatedIconRow(icon, setIcon, Modifier.padding(top = 8.dp))
+            AnimatedIconRow(icon, onIconChange, Modifier.padding(top = 8.dp))
         } else {
             Spacer(modifier = Modifier.height(16.dp))
         }
